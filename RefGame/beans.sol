@@ -4,70 +4,61 @@ pragma solidity ^0.8.0;
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.4.0/contracts/token/ERC20/ERC20.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.4.0/contracts/access/Ownable.sol";
 
-/**
- * @title Beans
- * @dev ERC20 Token that integrates a referral game, where participants earn points for referring others.
- */
 contract Beans is ERC20, Ownable {
     mapping(address => address) public referrer; // Maps a user to their referrer
-    mapping(address => uint256) public points; // Tracks points earned by each user
-    mapping(uint256 => uint256) public rewardPerLevel; // Points rewarded per referral level
+    mapping(address => uint256) public totalEarnings; // Total BEANS earned by each user
+    mapping(address => uint256) public withdrawnBEANS; // Total BEANS withdrawn by each user
+    uint256 public totalUsers = 0; // Total number of users who joined
+    address[] public topReferrers; // Dynamic array to track top referrers (updated manually or through a function)
 
-    uint256 public constant MAX_LEVEL = 15; // Maximum depth for referral rewards
+    uint256 public constant BASE_REWARD = 1000 * 10**18; // Base reward for direct referrals
+    uint256 public constant MAX_LEVEL = 15; // Maximum referral depth
+    uint256 public constant JOINING_BEANS = 10000 * 10**18; // BEANS given upon joining
 
-    constructor() ERC20("Beans", "BEANS") {
-        initializeRewards(); // Set initial reward points for referral levels
-    }
+    constructor() ERC20("Beans", "BEANS") {}
 
-    // Initialize the points rewarded for each referral level
-    function initializeRewards() internal {
-        rewardPerLevel[1] = 100; // Direct referrals earn 100 points
-        for (uint256 i = 2; i <= MAX_LEVEL; i++) {
-            rewardPerLevel[i] = rewardPerLevel[i - 1] / 2; // Halve the points for each subsequent level
-        }
-    }
-
-    /**
-     * @dev Allows a new user to join the game by specifying a referrer.
-     * Points are distributed up the referral chain, up to MAX_LEVEL.
-     * @param referrerAddress The address of the user's referrer.
-     */
     function join(address referrerAddress) external {
         require(referrer[msg.sender] == address(0), "User has already joined.");
         require(referrerAddress != msg.sender, "Cannot refer oneself.");
         require(referrerAddress != address(0), "Referrer cannot be the zero address.");
 
-        referrer[msg.sender] = referrerAddress;
-        // Distribute points up the referral chain
-        address currentReferrer = referrerAddress;
-        for (uint256 level = 1; level <= MAX_LEVEL && currentReferrer != address(0); level++) {
-            points[currentReferrer] += rewardPerLevel[level];
-            currentReferrer = referrer[currentReferrer];
+        totalUsers += 1; // Increment total users
+        _mint(msg.sender, JOINING_BEANS); // Mint joining BEANS
+        totalEarnings[msg.sender] += JOINING_BEANS; // Update total earnings
+
+        referrer[msg.sender] = referrerAddress; // Set referrer
+        uint256 reward = BASE_REWARD;
+
+        // Distribute rewards up the referral chain
+        for (uint256 level = 1; level <= MAX_LEVEL && referrerAddress != address(0); level++) {
+            _mint(referrerAddress, reward); // Mint reward for the referrer
+            totalEarnings[referrerAddress] += reward; // Update referrer's total earnings
+
+            referrerAddress = referrer[referrerAddress]; // Move up in the referral chain
+            reward /= 2; // Halve the reward for the next level
         }
+
+        // Optionally update top referrers list here or through a separate function
     }
 
-    /**
-     * @dev Allows users to withdraw their earned points as BEANS tokens.
-     * Each point is equivalent to one BEANS token.
-     */
-    function withdrawPoints() external {
-        uint256 userPoints = points[msg.sender];
-        require(userPoints > 0, "No points to withdraw.");
-        points[msg.sender] = 0; // Reset points to zero after withdrawal
-        _mint(msg.sender, userPoints); // Mint ERC20 tokens for the user
+    function withdrawBEANS() external {
+        uint256 availableBEANS = totalEarnings[msg.sender] - withdrawnBEANS[msg.sender];
+        require(availableBEANS > 0, "No BEANS available for withdrawal.");
+
+        withdrawnBEANS[msg.sender] += availableBEANS; // Update withdrawn BEANS
+        _mint(msg.sender, availableBEANS); // Mint available BEANS to user
     }
 
-    // Override required due to Solidity multiple inheritance rules
-    function _beforeTokenTransfer(address from, address to, uint256 amount)
-        internal
-        override(ERC20)
-    {
-        super._beforeTokenTransfer(from, to, amount);
+    function getTotalUsers() external view returns (uint256) {
+        return totalUsers;
     }
 
-    // Administrative function to update reward levels
-    function updateRewardPerLevel(uint256 level, uint256 newReward) external onlyOwner {
-        require(level > 0 && level <= MAX_LEVEL, "Invalid referral level.");
-        rewardPerLevel[level] = newReward;
+    function getAvailableBEANSToWithdraw(address user) external view returns (uint256) {
+        return totalEarnings[user] - withdrawnBEANS[user];
+    }
+
+    function getTopReferrers() external view returns (address[] memory) {
+        return topReferrers;
     }
 }
+
