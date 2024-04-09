@@ -10,12 +10,13 @@
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
-            color: #FF8C00; 
+            color: #8B0000; /* Blood red color */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             flex-direction: column;
+            font-family: 'Luminari', serif; /* Applying custom font */
         }
 
         @font-face {
@@ -25,38 +26,40 @@
             /* Add more src lines for different font formats if needed */
         }
 
-        button {
-            position: relative; 
-            font-family: 'Luminari', fantasy; 
-            /* Add other button styling as needed */
-            width: 150px; /* Set the width of the button */
-            height: 50px; /* Set the height of the button */
-            border: none; /* Remove default button border */
+        .button-image {
             cursor: pointer; /* Change cursor to pointer on hover */
-            overflow: hidden; /* Hide overflowing content */
+            opacity: 0.7; /* Set the opacity to make it translucent */
+            width: 100px; /* Adjust the width of the button images */
+            height: auto; /* Maintain aspect ratio */
+            animation: shake 0.5s infinite alternate; /* Periodic shake animation */
         }
 
-        button::before {
-            content: ''; /* Add content */
-            position: absolute; /* Set the position to absolute */
-            top: 0; /* Position from the top */
-            left: 0; /* Position from the left */
-            width: 50%; /* Set the width to 100% */
-            height: 100%; /* Set the height to 100% */
-            background-image: url(pics.jpg/lavaBean.jpg_small); /* Replace 'button_image.png' with the path to your button image */
-            background-size: cover; /* Ensure the image covers the entire button */
-            background-repeat: no-repeat; /* Prevent the image from repeating */
-            z-index: -1; /* Set z-index to move the image behind the text */
+        /* Shake animation */
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-5px);
+            }
         }
 
-        /* Style for h2 elements */
+        /* Adjust the opacity of the input field */
+        input[type="text"] {
+            opacity: 0.7; /* Set the opacity to make it translucent */
+            width: 200px; /* Adjust the width of the input field */
+        }
+
+        /* Adjust the size of the buttons */
+        img {
+            width: 100px; /* Adjust the width of the buttons */
+            height: 30px; /* Adjust the height of the buttons */
+            margin-bottom: 10px; /* Adjust margin */
+        }
+
+        /* Adjust the size of the headings */
         h2 {
-            margin: 10px 0;
-        }
-
-        /* Style for input and div elements */
-        input, div {
-            margin-bottom: 10px;
+            margin: 5px 0; /* Adjust margin */
         }
     </style>
 </head>
@@ -66,18 +69,16 @@
     <h2>Join the Game</h2>
     <label for="referrerAddress">Referrer Address:</label>
     <input type="text" id="referrerAddress" placeholder="miner address"><br>
-    <button onclick="joinGame()">Join Game</button>
+    <img src="pics.jpg/magmabean.png" onclick="joinGame()" alt="Join Game" class="button-image">
 
     <h2>Withdraw Points</h2>
-    <button onclick="withdrawPoints()">Withdraw Points</button><br>
+    <img src="pics.jpg/magmabean.png" onclick="withdrawPoints()" alt="Withdraw Points" class="button-image"><br>
 
     <h2>Check Balance</h2>
-    <button onclick="checkBalance()">Check Balance</button><br>
+    <img src="pics.jpg/magmabean.png" onclick="checkBalance()" alt="Check Balance" class="button-image"><br>
     <div id="balance"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.3.6/dist/web3.min.js"></script>
-    <script>
-        // JavaScript code for interacting with the smart contract
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
