@@ -5,7 +5,7 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.4.0/contr
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.4.0/contracts/security/Pausable.sol";
 
 /**
- * @title TheReferralGame (beans)
+ * @title TheReferralGame
  * @dev A referral game where participants earn points for referring others, withdrawable as BEANS tokens.
  * This contract integrates basic ERC20 token functionality, minting tokens upon points withdrawal.
  */
