@@ -25,8 +25,8 @@ async function connectWallet() {
 
 async function checkNetwork() {
     const chainId = await web3.eth.getChainId();
-    if (chainId !== 6969696969) {
-        alert('Please connect to Magma Testnet');
+    if (chainId !== 6969696969) { // Update this to the chain ID of your network
+        alert('Please connect to the correct network.');
         isConnected = false;
     }
 }
@@ -75,11 +75,11 @@ async function checkBalance() {
 }
 
 function updateUI() {
-    document.getElementById('walletInfo').innerText = `Connected: ${selectedAccount.substring(0, 6)}...${selectedAccount.substring(selectedAccount.length - 4)} on Magma Testnet`;
+    document.getElementById('walletInfo').innerText = `Connected: ${selectedAccount.substring(0, 6)}...${selectedAccount.substring(selectedAccount.length - 4)} on the correct network`;
 }
 
 // Initialize Web3
 const web3 = new Web3(window.ethereum);
 
-// Initialize contract with ABI and address imported from contractABI.js
+// Assuming `contractABI` and `contractAddress` are defined in `contractABI.js`
 const contract = new web3.eth.Contract(contractABI, contractAddress);
