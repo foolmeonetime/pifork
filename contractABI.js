@@ -437,5 +437,5 @@ const contractABI =
 	}
   ];
   
-  const contractAddress = "0xC751D9f15Bb1a3f86F960df22de8F28E6FFdc90a"; // Replace with ca for beans after deploy
+  const contractAddress = "0x842b7f4f77b8764ce6b8abf1abf6473bdc78a230"; // Replace with ca for beans after deploy
   
