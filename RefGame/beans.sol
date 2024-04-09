@@ -5,11 +5,11 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.4.0/contr
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.4.0/contracts/security/Pausable.sol";
 
 /**
- * @title TheReferralGame
+ * @title TheReferralGame (beans)
  * @dev A referral game where participants earn points for referring others, withdrawable as BEANS tokens.
  * This contract integrates basic ERC20 token functionality, minting tokens upon points withdrawal.
  */
-contract TheReferralGame is Ownable, Pausable {
+contract Beans is Ownable, Pausable {
     mapping(address => address) public referrer; // Maps a user to their referrer.
     mapping(address => uint256) public points; // Tracks points earned by each user.
     mapping(uint256 => uint256) public rewardPerLevel; // Points rewarded per referral level.
@@ -19,7 +19,7 @@ contract TheReferralGame is Ownable, Pausable {
     uint8 public constant decimals = 18;
 
     uint256 public totalSupply;
-    uint256 public constant MAX_SUPPLY = 999999999999 * (10**uint256(decimals)); // Max supply including decimals.
+    uint256 public constant MAX_SUPPLY = 100000000 * (10**uint256(decimals)); // Max supply including decimals.
     uint256 public constant MAX_LEVEL = 15; // Maximum depth for referral rewards.
 
     mapping(address => uint256) private balances;
@@ -30,7 +30,13 @@ contract TheReferralGame is Ownable, Pausable {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     constructor() {
+        require(
+            block.chainid == 6969696969,
+            "Contract is not on the correct network"
+        );
+
         initializeRewards(); // Set initial reward points for referral levels.
+        referrer[owner()] = owner(); // Set the contract owner as their own referrer.
     }
 
     // Initialize the points rewarded for each referral level.
@@ -55,7 +61,11 @@ contract TheReferralGame is Ownable, Pausable {
 
         // Distribute points up the referral chain.
         address currentReferrer = referrerAddress;
-        for (uint256 level = 1; level <= MAX_LEVEL && currentReferrer != address(0); level++) {
+        for (
+            uint256 level = 1;
+            level <= MAX_LEVEL && currentReferrer != address(0);
+            level++
+        ) {
             points[currentReferrer] += rewardPerLevel[level];
             emit PointsEarned(currentReferrer, rewardPerLevel[level]);
             currentReferrer = referrer[currentReferrer];
@@ -71,7 +81,10 @@ contract TheReferralGame is Ownable, Pausable {
         require(userPoints > 0, "No points to withdraw.");
 
         uint256 mintAmount = userPoints * (10**uint256(decimals)); // Convert points to token amount.
-        require(totalSupply + mintAmount <= MAX_SUPPLY, "Minting would exceed max supply.");
+        require(
+            totalSupply + mintAmount <= MAX_SUPPLY,
+            "Minting would exceed max supply."
+        );
 
         points[msg.sender] = 0; // Reset points to zero after withdrawal.
         totalSupply += mintAmount;
@@ -96,7 +109,10 @@ contract TheReferralGame is Ownable, Pausable {
      * @param amount The amount of tokens to transfer.
      * @return True if the transfer was successful, otherwise false.
      */
-    function transfer(address recipient, uint256 amount) external returns (bool) {
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool)
+    {
         require(balances[msg.sender] >= amount, "Not enough balance.");
         balances[msg.sender] -= amount;
         balances[recipient] += amount;
@@ -113,7 +129,10 @@ contract TheReferralGame is Ownable, Pausable {
         _unpause();
     }
 
-    function updateRewardPerLevel(uint256 level, uint256 newReward) external onlyOwner {
+    function updateRewardPerLevel(uint256 level, uint256 newReward)
+        external
+        onlyOwner
+    {
         require(level > 0 && level <= MAX_LEVEL, "Invalid referral level.");
         rewardPerLevel[level] = newReward;
     }
