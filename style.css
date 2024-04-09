@@ -36,16 +36,18 @@ input[type="text"] {
 button {
     width: 80%;
     padding: 10px;
-    background-color: #8B0000;
+    background: none;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+    background-image: url(magmabean.png); /* Replace 'button-image.png' with your image URL */
+    background-size: cover;
 }
 
 button:hover {
-    background-color: #a52a2a;
+    /* You can add hover effect if needed */
 }
 
 @media (max-width: 600px) {
