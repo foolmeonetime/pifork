@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagmaTrader</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include Web3.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.0/web3.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>MagmaTrader</h1>
+        <button id="connectWallet">Connect Wallet</button>
+        <div id="walletInfo">
+            <span id="connectedAccount"></span>
+        </div>
+    </header>
+    <main>
+        <div id="listNFTForm">
+            <h2>List an NFT</h2>
+            <input type="text" id="nftTokenAddress" placeholder="ERC721 Token Address">
+            <input type="text" id="nftTokenId" placeholder="Token ID">
+            <input type="text" id="nftPriceEth" placeholder="Price in LAVA">
+            <button onclick="approveAndListNFT()">List NFT</button>
+        </div>
+        
+        
+        
+        <section id="nft-listings">
+            <!-- NFT listings will be dynamically inserted here -->
+        </section>
+    </main>
+    <script src="contractABI.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
