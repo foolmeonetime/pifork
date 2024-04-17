@@ -1,6 +1,5 @@
-# pifork
+Imagine a decentralized game where you can earn rewards simply by participating and inviting others to join! In the BeanGame, you're not just a player; you're a part of a thriving community where every action you take earns you beans, the native tokens of the game.
 
-imagine a web dapp where you can use your etheruem wallet to partipate in a ecosystem that helps secure the magma blockchain nodes by mining a tin of $beans and watching ads on the app.
+By referring friends, you unlock special rewards, and by mining tokens, you contribute to the growth of the game while reaping benefits for yourself. With a maximum supply ensuring fairness and a dynamic leveling system adding depth to your journey, the BeanGame offers an exciting and rewarding experience where everyone can play, earn, and have fun in a decentralized environment. 
 
-its free to particpate just ad revenue focused. in order to mine beans you need an active miner wallet address aka a referral, miners recieve points for referrals you can make tiers of the system with direct and indirect referrals and more (referral of referral) and so on. 
-
+Join us in the BeanGame and let's grow together! Oh and also NODES!!!
