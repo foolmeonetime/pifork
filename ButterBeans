@@ -1,0 +1,108 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract BeanGame {
+    address public owner; // Deployer wallet address
+    uint256 public maxSupply = 42690000000 * 10**18; // Maximum supply of beans
+    uint256 public beansMinted; // Total beans minted
+    uint256 public referralReward = 420 * 10**18; // Beans rewarded for referrals
+    uint256 public miningReward = 2.3 * 10**18; // Beans rewarded for mining
+    bool public withdrawPaused = true; // Withdrawal functionality paused by default
+
+    address public miningAddress; // Address to send mined beans
+
+    mapping(address => uint256) public points; // Points earned by players
+    mapping(address => uint256) public beansBalance; // Beans balance of players
+    mapping(address => address) public referrer; // Referrer of each player
+    mapping(address => uint256) public lastMiningTime; // Last mining time for each player
+    mapping(address => uint256) public referralCount; // Referral count for each player
+    mapping(address => uint256) public level; // Level of each player
+
+    uint256 public constant miningCooldown = 1 days; // Mining cooldown period
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+
+    modifier withdrawEnabled() {
+        require(!withdrawPaused || msg.sender == owner, "Withdrawal is paused");
+        _;
+    }
+
+    constructor(address _miningAddress) {
+        owner = msg.sender;
+        miningAddress = _miningAddress;
+    }
+
+    function joinGame(address _referrer) external {
+        require(beansMinted + referralReward <= maxSupply, "Maximum supply reached");
+        require(referrer[msg.sender] == address(0), "Player already joined");
+        require(_referrer != msg.sender, "Cannot refer yourself");
+
+        referrer[msg.sender] = _referrer;
+        referralCount[_referrer]++;
+
+        // Mint beans and send to the new player
+        beansBalance[msg.sender] += referralReward;
+        beansMinted += referralReward;
+
+        // Update points and level based on referrals
+        updateLevel(msg.sender);
+        points[_referrer] += 3;
+    }
+
+    function mineTokens() external {
+        require(referrer[msg.sender] != address(0), "Player not joined");
+        require(block.timestamp >= lastMiningTime[msg.sender] + miningCooldown, "Mining cooldown active");
+
+        // Mint beans and send to the player
+        beansBalance[msg.sender] += miningReward;
+        beansMinted += miningReward;
+
+        // Update points and level based on mining
+        updateLevel(msg.sender);
+        points[msg.sender] += 1;
+
+        // Update last mining time
+        lastMiningTime[msg.sender] = block.timestamp;
+
+        // Give points to the referrer
+        if (referrer[msg.sender] != address(0)) {
+            points[referrer[msg.sender]] += 1;
+        }
+
+        // Send mined tokens to the designated mining address
+        payable(miningAddress).transfer(miningReward);
+    }
+
+    function withdrawBeans(uint256 _amount) external withdrawEnabled {
+        require(_amount <= beansBalance[msg.sender], "Insufficient balance");
+
+        // Transfer beans to player
+        beansBalance[msg.sender] -= _amount;
+        payable(msg.sender).transfer(_amount);
+    }
+
+    function pauseWithdrawal() external onlyOwner {
+        withdrawPaused = true;
+    }
+
+    function resumeWithdrawal() external onlyOwner {
+        withdrawPaused = false;
+    }
+
+    function updateLevel(address player) private {
+        uint256 currentLevel = level[player];
+        uint256 referrals = referralCount[player];
+
+        if (referrals >= 5 && referrals < 10 && currentLevel < 2) {
+            level[player] = 2;
+        } else if (referrals >= 10 && referrals < 15 && currentLevel < 3) {
+            level[player] = 3;
+        } else if (referrals >= 15 && referrals < 20 && currentLevel < 4) {
+            level[player] = 4;
+        }
+        // Continue adding level conditions for higher thresholds
+        // Example: Add more conditions for levels 5 to 15 based on referral count
+    }
