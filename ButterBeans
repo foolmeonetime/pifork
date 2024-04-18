@@ -17,8 +17,10 @@ contract BeanGame {
     mapping(address => uint256) public lastMiningTime; // Last mining time for each player
     mapping(address => uint256) public referralCount; // Referral count for each player
     mapping(address => uint256) public level; // Level of each player
+    mapping(address => address[]) public teamMembers; // Team members for each player
 
     uint256 public constant miningCooldown = 1 days; // Mining cooldown period
+    uint256 public constant maxTeamSize = 50; // Maximum number of players per team
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
@@ -50,6 +52,19 @@ contract BeanGame {
         // Update points and level based on referrals
         updateLevel(msg.sender);
         points[_referrer] += 3;
+    }
+
+    function inviteToTeam(address _player) external {
+        require(teamMembers[msg.sender].length < maxTeamSize, "Team is full");
+        require(referrer[_player] == address(0), "Player is already in a team");
+        require(_player != msg.sender, "Cannot invite yourself to team");
+
+        teamMembers[msg.sender].push(_player);
+        referrer[_player] = msg.sender;
+    }
+
+    function checkReferralCount(address _player) external view returns (uint256) {
+        return referralCount[_player];
     }
 
     function mineTokens() external {
@@ -102,7 +117,29 @@ contract BeanGame {
             level[player] = 3;
         } else if (referrals >= 15 && referrals < 20 && currentLevel < 4) {
             level[player] = 4;
+        } else if (referrals >= 20 && referrals < 25 && currentLevel < 5) {
+            level[player] = 5;
+        } else if (referrals >= 25 && referrals < 30 && currentLevel < 6) {
+            level[player] = 6;
+        } else if (referrals >= 30 && referrals < 35 && currentLevel < 7) {
+            level[player] = 7;
+        } else if (referrals >= 35 && referrals < 40 && currentLevel < 8) {
+            level[player] = 8;
+        } else if (referrals >= 40 && referrals < 45 && currentLevel < 9) {
+            level[player] = 9;
+        } else if (referrals >= 45 && referrals < 50 && currentLevel < 10) {
+            level[player] = 10;
+        } else if (referrals >= 50 && referrals < 55 && currentLevel < 11) {
+            level[player] = 11;
+        } else if (referrals >= 55 && referrals < 60 && currentLevel < 12) {
+            level[player] = 12;
+        } else if (referrals >= 60 && referrals < 65 && currentLevel < 13) {
+            level[player] = 13;
+        } else if (referrals >= 65 && referrals < 70 && currentLevel < 14) {
+            level[player] = 14;
+        } else if (referrals >= 70 && referrals < 75 && currentLevel < 15) {
+            level[player] = 15;
         }
-        // Continue adding level conditions for higher thresholds
-        // Example: Add more conditions for levels 5 to 15 based on referral count
+        // Add more conditions for higher levels if needed
     }
+}
