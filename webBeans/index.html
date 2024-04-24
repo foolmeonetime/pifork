@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bean Tin</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethereum/web3@1.3.5/dist/web3.min.js"></script>
+    <style>
+        /* Set background image */
+        body {
+            background-image: url('pics/logo.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Header styling */
+        h1 {
+            text-align: center; /* Center the text */
+            margin-top: 20px; /* Add some top margin for spacing */
+            z-index: 2; /* Ensure it's above the Connect Wallet button */
+            background: linear-gradient(180deg, #ff0000, #ff8000, #ffff00, #f79605, #ff3c00, #020003, #020002);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Image container styling */
+        .image-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 20px;
+            z-index: 1;
+        }
+
+        /* Image button styling */
+        .image-button {
+            position: relative;
+            cursor: pointer;
+            width: 100px;
+            height: auto;
+            background: transparent;
+            border: none;
+            padding: 0;
+            background: linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #00ff00, #0000ff, #8000ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Image button hover effect */
+        .image-button:hover {
+            opacity: 0.7;
+        }
+
+        /* Connect Wallet button styling */
+        .connect-wallet-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+            background: linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #00ff00, #0000ff, #8000ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Referral wallet input field styling */
+        .referral-input {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>The Bean Tin</h1>
+    <!-- Connect Wallet button -->
+    <button class="connect-wallet-button" onclick="connectWallet()">Connect Wallet</button>
+
+    <!-- Referral wallet input field -->
+    <form class="referral-input" onsubmit="return false;">
+        <label for="referralAddress">Enter Referral Wallet Address:</label><br>
+        <input type="text" id="referralAddress" name="referralAddress"><br>
+        <button onclick="joinGameWithReferral()">Join Game with Referral</button>
+    </form>
+    
+    <div class="image-container">
+        <img class="image-button" src="pics/nobckgr-removebg-preview (1).png" alt="Mine Tokens" onclick="mineTokens()"> Mine Tokens
+        <img class="image-button" src="pics/nobckgr-removebg-preview (1).png" alt="Check Stats" onclick="checkStats()"> Check Stats
+        <img class="image-button" src="pics/nobckgr-removebg-preview (1).png" alt="Join Team" onclick="joinTeam()"> Join Team
+        <img class="image-button" src="pics/nobckgr-removebg-preview (1).png" alt="Withdraw Tokens" onclick="withdrawTokens()"> Withdraw Tokens
+    </div>
+
+    <div id="stats"></div>
+
+    <script>
+        // Web3 instance
+        let web3;
+
+        // Contract ABI
+        const contractABI = [
+            // Contract methods...
+        ];
+
+        // Contract address
+        const contractAddress = 'YOUR_CONTRACT_ADDRESS';
+
+        // Contract instance
+        let contract;
+
+        // Function to join the game with referral
+        async function joinGameWithReferral() {
+            const referralAddress = document.getElementById('referralAddress').value;
+            // Check if the referral address is valid (you may want to add validation logic here)
+            if (referralAddress.trim() === '') {
+                alert('Please enter a valid referral wallet address.');
+                return;
+            }
+            await contract.methods.joinGameWithReferral(referralAddress).send({ from: web3.eth.defaultAccount });
+            // Reload stats after joining the game
+            await checkStats();
+        }
+
+        // Function to mine tokens
+        async function mineTokens() {
+            await contract.methods.mineTokens().send({ from: web3.eth.defaultAccount });
+            // Reload stats after mining tokens
+            await checkStats();
+        }
+
+        // Function to connect wallet
+        async function connectWallet() {
+            // Check if MetaMask is installed
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                try {
+                    // Request account access if needed
+                    await window.ethereum.enable();
+                    console.log('Wallet connected:', web3.eth.defaultAccount);
+                    // Initialize contract instance
+                    contract = new web3.eth.Contract(contractABI, contractAddress);
+                } catch (error) {
+                    console.error('User denied account access');
+                }
+            } else {
+                console.error('MetaMask is not installed');
+            }
+        }
+
+        // Function to check stats
+        async function checkStats() {
+            const statsDiv = document.getElementById('stats');
+            // Clear previous stats
+            statsDiv.innerHTML = '';
+            // Fetch and display player stats (beans balance, referrals count, and points)
+            const beansBalance = await contract.methods.beansBalance(web3.eth.defaultAccount).call();
+            const referralCount = await contract.methods.referralCount(web3.eth.defaultAccount).call();
+            const points = await contract.methods.points(web3.eth.defaultAccount).call();
+
+            // Display stats
+            statsDiv.innerHTML = `<p>Beans Balance: ${beansBalance}</p>`;
+            statsDiv.innerHTML += `<p>Referral Count: ${referralCount}</p>`;
+            statsDiv.innerHTML += `<p>Points: ${points}</p>`;
+        }
+
+        // Function to join team
+        async function joinTeam() {
+            // Your implementation to interact with the contract method for joining a team
+        }
+
+        // Function to withdraw tokens
+        async function withdrawTokens() {
+            // Your implementation to interact with the contract method for withdrawing tokens
+        }
+    </script>
+</body>
+</html>
+
+
+
