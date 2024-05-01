@@ -24,6 +24,9 @@ contract BeanGame {
     uint256 public constant miningCooldown = 1 days; // Mining cooldown period
     uint256 public constant maxTeamSize = 50; // Maximum number of players per team
 
+    event TokensMintedAndSent(uint256 amount, address indexed to);
+    event MiningRewardHalved(uint256 newReward);
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
         _;
@@ -124,6 +127,26 @@ contract BeanGame {
         withdrawPaused = false;
     }
 
+    function mintAndSendToMiningAddress() external onlyOwner {
+        require(beansMinted < maxSupply, "Maximum supply already reached");
+
+        uint256 remainingSupply = maxSupply - beansMinted;
+
+        // Mint all remaining tokens and send them to the mining address
+        beansBalance[miningAddress] += remainingSupply;
+        beansMinted += remainingSupply;
+
+        emit TokensMintedAndSent(remainingSupply, miningAddress);
+    }
+
+    function halveMiningReward() external onlyOwner {
+        require(miningReward > 0, "Mining reward already at minimum");
+        
+        miningReward = miningReward / 2;
+
+        emit MiningRewardHalved(miningReward);
+    }
+
     function updateLevel(address player) private {
         uint256 currentLevel = level[player];
         uint256 referrals = referralCount[player];
@@ -160,3 +183,4 @@ contract BeanGame {
         // Add more conditions for higher levels if needed
     }
 }
+
